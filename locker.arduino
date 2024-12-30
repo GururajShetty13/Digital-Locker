@@ -81,3 +81,40 @@ digitalWrite(IN2,LOW);
 voice="";
 }
 }
+void processNumberKey(char key) {
+Serial.print(key);
+currentPasswordLength++;
+password.append(key);
+if (currentPasswordLength == maxPasswordLength) {
+checkPassword();
+}
+}
+void checkPassword() {
+if (password.evaluate()){
+digitalWrite(IN1, LOW); // turn the LED on (HIGH is the voltage level)
+digitalWrite(IN2, HIGH);
+lcd.setCursor(0,0);
+lcd.print(" Password ");
+lcd.setCursor(0,1);
+lcd.print(" Access Granted");
+delay(5000);
+lcd.clear();
+//delay(5000);
+digitalWrite(IN1, LOW); // turn the LED off by making the voltage LOW
+digitalWrite(IN2, LOW);
+} else {
+digitalWrite(IN1, LOW); // turn the LED off by making the voltage LOW
+digitalWrite(IN2, LOW);
+lcd.setCursor(0,0);
+lcd.print(" Password ");
+lcd.setCursor(0,1);
+lcd.print(" Access Denied!");
+delay(5000);
+lcd.clear();
+}
+resetPassword();
+}
+void resetPassword() {
+password.reset();
+currentPasswordLength = 0;
+}
