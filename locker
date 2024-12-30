@@ -1,0 +1,83 @@
+#include <Password.h>
+#include <Password.h>
+#include <LiquidCrystal.h>
+#include <Keypad.h>
+String newPasswordString; //hold the new password
+String voice;
+char newPassword[6]; //charater string of newPasswordString
+int IN1 = 36;
+int IN2 = 37;
+//initialize password to xxxx
+//you can use password.set(newPassword) to overwrite it
+Password password = Password( "0000" );
+byte maxPasswordLength = 4;
+byte currentPasswordLength = 0;
+const byte ROWS = 4; // Four rows
+const byte COLS = 4; // Four columns
+//Define the keymap
+char keys[ROWS][COLS] = {
+{'1','2','3','A'},
+{'4','5','6','B'},
+{'7','8','9','C'},
+{'*','0','#','D'}
+};
+//// Connect keypad ROW0, ROW1, ROW2 and ROW3 to these Arduino pins.
+byte rowPins[ROWS] = {6,7,8,9}; //connect to row pinouts
+// Connect keypad COL0, COL1, COL2 and COL3 to these Arduino pins.
+byte colPins[COLS] = {2,3,4,5}; //connect to column pinouts
+// Create the Keypad
+Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
+LiquidCrystal lcd(12, 11, 38,39,40,41);
+void setup(){
+lcd.begin(16,2);
+lcd.setCursor(0,0);
+//lcd.print("digital locker");
+lcd.setCursor(0,0);
+lcd.print("Enter Password");
+//delay(5000);
+//lcd.clear();
+Serial.begin(9600);
+pinMode (IN1, OUTPUT);
+pinMode (IN2, OUTPUT);
+}
+void loop(){
+char key = keypad.getKey();
+if (key != NO_KEY){
+delay(60);
+switch (key){
+default: processNumberKey(key);
+}
+}
+while (Serial.available())
+{
+delay(10);
+char c = Serial.read();
+voice += c;
+}
+if (voice.length() > 0)
+{
+Serial.println(voice);
+if(voice == "on")
+{
+lcd.clear();
+// lcd.print("bluetooth connected");
+digitalWrite(IN1,LOW);
+digitalWrite(IN2,HIGH);
+lcd.setCursor(0,0);
+lcd.print(" Password");
+lcd.setCursor(0,1);
+lcd.print(" Access Granted");
+delay(5000);
+lcd.clear();
+digitalWrite(IN1,LOW);
+digitalWrite(IN2,LOW);
+//lcd.print("access granted");
+}
+else if(voice == "off")
+{
+digitalWrite(IN1,LOW);
+digitalWrite(IN2,LOW);
+}
+voice="";
+}
+}
